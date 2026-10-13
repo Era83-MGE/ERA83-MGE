@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11100e">
+<title>ERA 83 — MGE Calculator</title>
+<style>
+:root{--bg:#11100e;--panel:#1b1915;--panel2:#242119;--gold:#d9b45b;--gold2:#f3d98b;--text:#f4f0e5;--muted:#b6ad98;--line:#4a4028;--green:#9fcb8a;--red:#ef9a90}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#292316 0,#11100e 58%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1180px;margin:auto;padding:16px}
+header{display:flex;align-items:center;gap:14px;padding:18px 0 22px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.crest{width:66px;height:66px;flex:0 0 66px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font-family:Georgia,serif;font-size:25px;font-weight:800;box-shadow:0 0 22px #d9b45b20,inset 0 0 12px #d9b45b18}
+h1{font:700 clamp(24px,4vw,36px)/1.1 Georgia,serif;letter-spacing:2px;color:var(--gold2);margin:0}
+.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
+header .edition{margin-left:auto;color:var(--gold);border:1px solid var(--line);padding:7px 10px;border-radius:9px;font-size:12px;white-space:nowrap}
+h2,h3{font-family:Georgia,serif;color:var(--gold2)}
+h2{font-size:23px;margin:0 0 12px}h3{font-size:17px;margin:0 0 9px}
+.panel{background:linear-gradient(145deg,#211e17,#171612);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 8px 24px #0002}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:#11100dcc;border:1px solid #3d3525;border-radius:11px;padding:12px}
+.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:clamp(18px,2.5vw,27px);font-weight:750;color:var(--gold2);overflow-wrap:anywhere;margin-top:4px}
+.progress-track{height:12px;background:#0d0c0a;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:12px 0 5px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#8f6a21,var(--gold2));transition:width .2s}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:5px;min-width:130px;flex:1}
+label{font-size:12px;color:var(--muted)}
+input,select{width:100%;background:#100f0d;color:var(--text);border:1px solid #51452c;border-radius:8px;padding:10px;min-width:0}
+input:focus,select:focus{outline:2px solid #d9b45b66;border-color:var(--gold)}
+button{border:1px solid #8e7135;background:#3a2e17;color:var(--gold2);border-radius:8px;padding:9px 12px;font-weight:650}
+button:hover{background:#4b3b1d}
+button.secondary{background:#201e19;border-color:#514a3b;color:var(--text)}
+button.danger{border-color:#8b4138;background:#3a1d1a;color:#ffd1ca}
+button.small{padding:6px 9px;font-size:13px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 12px;margin-bottom:6px;scrollbar-width:thin}
+.tab{white-space:nowrap;background:#1c1a15;border-color:#51452c}
+.tab.active{background:linear-gradient(135deg,#8d6a25,#4a3716);border-color:var(--gold2);color:#fff4ce}
+.day-heading{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap;margin-bottom:14px}
+.day-heading p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.day-total{border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--gold2);white-space:nowrap}
+.mission-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mission{background:#12110f;border:1px solid #3c3425;border-radius:11px;padding:12px;min-width:0}
+.mission-title{font-weight:700;margin-bottom:5px}
+.mission-desc{font-size:12px;color:var(--muted);margin-bottom:10px}
+.mission-controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.mission-controls input{padding:9px}
+.points{color:var(--gold2);font-weight:750;text-align:right;margin-top:8px;font-size:14px}
+.help{font-size:12px;color:var(--muted);margin-top:8px}
+.inline-note{padding:10px 12px;background:#211e16;border-left:3px solid var(--gold);border-radius:5px;color:#ddd2b8;font-size:13px;margin:10px 0}
+.calc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.day-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.day-link{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#13120f;border:1px solid #3d3525;border-radius:9px;padding:10px;text-align:left;color:var(--text)}
+.day-link span:last-child{color:var(--gold2);font-weight:700;white-space:nowrap}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:8px 0 20px}
+.hidden{display:none!important}
+.status{font-size:12px;color:var(--green);min-height:18px}
+@media(max-width:760px){.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mission-list{grid-template-columns:1fr}.calc-grid{grid-template-columns:1fr}.wrap{padding:11px}.panel{padding:13px}header .edition{display:none}.crest{width:54px;height:54px;flex-basis:54px;font-size:21px}.day-list{grid-template-columns:1fr}}
+@media(min-width:761px) and (max-width:980px){.mission-list{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="crest" aria-label="Emblema 83">83</div>
+  <div><h1>ERA 83</h1><div class="subtitle">MGE CALCULATOR · GOBERNADOR MÁS PODEROSO</div></div>
+  <div class="edition">VERSIÓN 1.0</div>
+</header>
+
+<section class="panel">
+  <div class="toolbar"><h2>Panel de mando</h2><div class="status" id="saveStatus" aria-live="polite">Guardado local activado</div></div>
+  <div class="row" style="margin-bottom:13px">
+    <div class="field" style="max-width:310px"><label for="goal">Objetivo personal de puntos</label><input id="goal" type="number" min="0" step="1" value="200000"></div>
+    <div class="field" style="max-width:200px"><label for="preset">Objetivos rápidos</label><select id="preset"><option value="">Elegir objetivo…</option><option value="50000">50.000</option><option value="100000">100.000</option><option value="200000">200.000</option><option value="300000">300.000</option><option value="500000">500.000</option></select></div>
+    <button id="resetBtn" class="danger" type="button">Nuevo evento / Reiniciar</button>
+  </div>
+  <div class="dashboard-grid">
+    <div class="stat"><div class="label">Puntos acumulados</div><div class="value" id="totalPoints">0</div></div>
+    <div class="stat"><div class="label">Puntos restantes</div><div class="value" id="remainingPoints">200.000</div></div>
+    <div class="stat"><div class="label">Progreso del objetivo</div><div class="value" id="progressText">0%</div></div>
+    <div class="stat"><div class="label">Jornadas con puntos</div><div class="value" id="daysActive">0 / 7</div></div>
+  </div>
+  <div class="progress-track" role="progressbar" aria-label="Progreso del objetivo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="help">Los datos se guardan automáticamente en este navegador y dispositivo. No se sincronizan entre dispositivos ni se envían a un servidor.</div>
+</section>
+
+<section class="panel">
+  <h2>Resumen de las siete jornadas</h2>
+  <div id="daySummary" class="day-list"></div>
+</section>
+
+<nav class="tabs" id="tabs" aria-label="Jornadas del evento"></nav>
+<main id="dayContent"></main>
+
+<footer>ERA 83 · MGE Calculator v1.0 · Herramienta personal no oficial.</footer>
+</div>
+
+<script>
+'use strict';
+const STORAGE_KEY = 'era83_mge_calculator_v1';
+const LEVEL_POINTS = {1:2,2:3,3:5,4:10,5:20,6:50,7:100,8:150,9:200};
+const DAYS = [
+ {name:'Incursión tribal', short:'Día 1', description:'Derrota tribus bárbaras y calcula la resistencia necesaria.', missions:[
+  {id:'tribe_1_4',name:'Tribus de nivel 1–4',desc:'Puntos por tribu derrotada.',points:50},
+  {id:'tribe_5_8',name:'Tribus de nivel 5–8',desc:'Puntos por tribu derrotada.',points:80},
+  {id:'tribe_9_12',name:'Tribus de nivel 9–12',desc:'Puntos por tribu derrotada.',points:100},
+  {id:'tribe_13_16',name:'Tribus de nivel 13–16',desc:'Puntos por tribu derrotada.',points:150},
+  {id:'tribe_17_20',name:'Tribus de nivel 17–20',desc:'Puntos por tribu derrotada.',points:180},
+  {id:'tribe_21_24',name:'Tribus de nivel 21–24',desc:'Puntos por tribu derrotada.',points:220},
+  {id:'tribe_25_28',name:'Tribus de nivel 25–28',desc:'Puntos por tribu derrotada.',points:260},
+  {id:'tribe_29_plus',name:'Tribus de nivel 29 o superior',desc:'Puntos por tribu derrotada.',points:300}
+ ]},
+ {name:'Crecimiento del héroe',short:'Día 2',description:'Equipo, medallas y pergaminos de habilidad.',missions:[
+  {id:'rare_gear',name:'Crear equipo raro',desc:'Por pieza creada.',points:1000},
+  {id:'epic_gear',name:'Crear equipo épico',desc:'Por pieza creada.',points:5000},
+  {id:'legendary_gear',name:'Crear equipo legendario',desc:'Por pieza creada.',points:30000},
+  {id:'epic_medal',name:'Usar medalla de héroe épica exclusiva',desc:'Por medalla usada.',points:500},
+  {id:'legendary_medal',name:'Usar medalla de héroe legendaria exclusiva',desc:'Por medalla usada.',points:2500},
+  {id:'epic_scroll',name:'Usar pergamino de habilidad épica universal',desc:'Por pergamino usado.',points:350},
+  {id:'legendary_scroll',name:'Usar pergamino de habilidad legendaria universal',desc:'Por pergamino usado.',points:2000}
+ ]},
+ {name:'Recolección de recursos',short:'Día 3',description:'Introduce las unidades recolectadas. Los recursos normales puntúan por cada bloque completo de 100.',missions:[
+  {id:'wood',name:'Recolectar madera',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'food',name:'Recolectar alimento',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'stone',name:'Recolectar piedra',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'gold',name:'Recolectar oro',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'primordial_dew',name:'Conseguir rocío primordial',desc:'12 puntos por unidad.',points:12},
+  {id:'legendary_wheel',name:'Girar Advenimiento legendario',desc:'Por giro de ruleta.',points:1000}
+ ]},
+ {name:'Contrarreloj',short:'Día 4',description:'Aceleradores, Arte delicado y materiales de mejora.',missions:[
+  {id:'build_speedup',name:'Aceleradores de construcción',desc:'30 puntos por minuto consumido.',type:'speedup'},
+  {id:'research_speedup',name:'Aceleradores de investigación',desc:'30 puntos por minuto consumido.',type:'speedup'},
+  {id:'delicate_art',name:'Crear en Arte delicado',desc:'Por creación.',points:2000},
+  {id:'copper_sand',name:'Usar arena cobriza',desc:'Por unidad usada para mejorar anillos de sello.',points:400},
+  {id:'silver_sand',name:'Usar arena plateada',desc:'Por unidad usada para mejorar anillos de sello.',points:1000},
+  {id:'fine_gold',name:'Usar oro fino',desc:'Por unidad usada para mejorar anillos de sello.',points:3000},
+  {id:'meteorite_steel',name:'Usar acero meteorito',desc:'Por unidad usada para mejorar anillos de sello.',points:20000}
+ ]},
+ {name:'Entrenamiento de unidades',short:'Día 5',description:'Entrenamiento por nivel y calculadora de ascenso de unidades.',missions:[
+  {id:'train_1',name:'Entrenar unidades de nivel 1',desc:'2 puntos por unidad.',points:2},
+  {id:'train_2',name:'Entrenar unidades de nivel 2',desc:'3 puntos por unidad.',points:3},
+  {id:'train_3',name:'Entrenar unidades de nivel 3',desc:'5 puntos por unidad.',points:5},
+  {id:'train_4',name:'Entrenar unidades de nivel 4',desc:'10 puntos por unidad.',points:10},
+  {id:'train_5',name:'Entrenar unidades de nivel 5',desc:'20 puntos por unidad.',points:20},
+  {id:'train_6',name:'Entrenar unidades de nivel 6',desc:'50 puntos por unidad.',points:50},
+  {id:'train_7',name:'Entrenar unidades de nivel 7',desc:'100 puntos por unidad.',points:100},
+  {id:'train_8',name:'Entrenar unidades de nivel 8',desc:'150 puntos por unidad.',points:150},
+  {id:'train_9',name:'Entrenar unidades de nivel 9',desc:'200 puntos por unidad.',points:200}
+ ]},
+ {name:'Aumento de poder',short:'Día 6',description:'Introduce el poder ganado por cada actividad.',missions:[
+  {id:'power_building',name:'Poder ganado con construcción',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'power_research',name:'Poder ganado con investigación',desc:'6 puntos por cada 1 de poder ganado.',points:6},
+  {id:'power_training',name:'Poder ganado con entrenamiento',desc:'3 puntos por cada 1 de poder ganado.',points:3}
+ ]},
+ {name:'Ir a por todo',short:'Día 7',description:'Lista de misiones indicada para el último día del evento.',missions:[
+  {id:'d7_tribe_1_4',name:'Tribus de nivel 1–4',desc:'Puntos por tribu derrotada.',points:50},
+  {id:'d7_tribe_5_8',name:'Tribus de nivel 5–8',desc:'Puntos por tribu derrotada.',points:80},
+  {id:'d7_tribe_9_12',name:'Tribus de nivel 9–12',desc:'Puntos por tribu derrotada.',points:100},
+  {id:'d7_tribe_13_16',name:'Tribus de nivel 13–16',desc:'Puntos por tribu derrotada.',points:150},
+  {id:'d7_tribe_17_20',name:'Tribus de nivel 17–20',desc:'Puntos por tribu derrotada.',points:180},
+  {id:'d7_tribe_21_24',name:'Tribus de nivel 21–24',desc:'Puntos por tribu derrotada.',points:220},
+  {id:'d7_tribe_25_28',name:'Tribus de nivel 25–28',desc:'Puntos por tribu derrotada.',points:260},
+  {id:'d7_tribe_29_plus',name:'Tribus de nivel 29 o superior',desc:'Puntos por tribu derrotada.',points:300},
+  {id:'d7_wood',name:'Recolectar madera',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_food',name:'Recolectar alimento',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_stone',name:'Recolectar piedra',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_gold',name:'Recolectar oro',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_delicate_art',name:'Crear en Arte delicado',desc:'Por creación.',points:2000},
+  {id:'d7_copper_sand',name:'Usar arena cobriza',desc:'Por unidad usada.',points:400},
+  {id:'d7_silver_sand',name:'Usar arena plateada',desc:'Por unidad usada.',points:1000},
+  {id:'d7_fine_gold',name:'Usar oro fino',desc:'Por unidad usada.',points:3000},
+  {id:'d7_meteorite_steel',name:'Usar acero meteorito',desc:'Por unidad usada.',points:20000},
+  {id:'d7_power_building',name:'Poder ganado con construcción',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'d7_power_research',name:'Poder ganado con investigación',desc:'6 puntos por cada 1 de poder ganado.',points:6},
+  {id:'d7_power_training',name:'Poder ganado con entrenamiento',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'d7_legendary_wheel',name:'Girar Advenimiento legendario',desc:'Por giro de ruleta.',points:1000},
+  {id:'d7_epic_medal',name:'Usar medalla de héroe épica exclusiva',desc:'Por medalla usada.',points:500},
+  {id:'d7_legendary_medal',name:'Usar medalla de héroe legendaria exclusiva',desc:'Por medalla usada.',points:2500},
+  {id:'d7_epic_scroll',name:'Usar pergamino de habilidad épica universal',desc:'Por pergamino usado.',points:350},
+  {id:'d7_legendary_scroll',name:'Usar pergamino de habilidad legendaria universal',desc:'Por pergamino usado.',points:2000}
+ ]}
+];
+
+function freshState(){return {goal:200000,activeDay:0,counts:{},tribeResistanceCost:5,resistanceAvailable:'',ascension:{from:6,to:8,amount:0}}}
+let state=freshState();
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
+function safeNumber(value){const n=Number(value);return Number.isFinite(n)&&n>0?n:0}
+function getCount(id){return safeNumber(state.counts[id])}
+function saveState(showStatus=true){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));if(showStatus){$('saveStatus').textContent='Guardado automáticamente ✓';}}
+ catch(e){$('saveStatus').textContent='No se pudo guardar en este navegador';}
+}
+function loadState(){
+ try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state={...freshState(),...parsed,counts:parsed.counts&&typeof parsed.counts==='object'?parsed.counts:{},ascension:{...freshState().ascension,...(parsed.ascension||{})}};}}
+ catch(e){state=freshState();}
+}
+function missionPoints(m){
+ const count=getCount(m.id);
+ if(m.type==='resource100') return Math.floor(count/100);
+ if(m.type==='speedup'){const unit=state.counts[m.id+'_unit']||'minutes';const factor={minutes:1,hours:60,days:1440}[unit]||1;return count*factor*30;}
+ return count*(m.points||0);
+}
+function dayPoints(dayIndex){return DAYS[dayIndex].missions.reduce((sum,m)=>sum+missionPoints(m),0)+(dayIndex===4?ascensionPoints():0)}
+function totalPoints(){return DAYS.reduce((sum,d,i)=>sum+dayPoints(i),0)}
+function ascensionPoints(){
+ const a=state.ascension||{from:6,to:8,amount:0};
+ const from=Number(a.from),to=Number(a.to),amount=safeNumber(a.amount);
+ if(!LEVEL_POINTS[from]||!LEVEL_POINTS[to]||to<from)return 0;
+ return (LEVEL_POINTS[to]-LEVEL_POINTS[from])*amount;
+}
+function updateDashboard(){
+ const total=totalPoints(),goal=safeNumber(state.goal),remaining=Math.max(0,goal-total),pct=goal>0?total/goal*100:(total>0?100:0);
+ $('totalPoints').textContent=fmt(total);$('remainingPoints').textContent=fmt(remaining);$('progressText').textContent=fmt(pct)+'%';
+ $('progressFill').style.width=Math.min(100,pct)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.min(100,pct)));
+ $('daysActive').textContent=DAYS.filter((d,i)=>dayPoints(i)>0).length+' / 7';
+ $('goal').value=state.goal;
+ renderSummary();
+ const heading=$('dayContent').querySelector('[data-day-total]');
+ if(heading)heading.textContent=fmt(dayPoints(state.activeDay))+' puntos';
+}
+function renderSummary(){
+ $('daySummary').innerHTML=DAYS.map((d,i)=>`<button type="button" class="day-link" data-goto="${i}"><span>${d.short} · ${escapeHtml(d.name)}</span><span>${fmt(dayPoints(i))} pts ›</span></button>`).join('');
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderTabs(){
+ $('tabs').innerHTML=DAYS.map((d,i)=>`<button type="button" class="tab ${i===state.activeDay?'active':''}" data-goto="${i}">${d.short}</button>`).join('');
+}
+function missionCard(m){
+ const count=getCount(m.id);
+ let controls='';
+ if(m.type==='speedup'){
+   const unit=state.counts[m.id+'_unit']||'minutes';
+   const displayed=count;
+   controls=`<div class="mission-controls"><input aria-label="Cantidad para ${escapeHtml(m.name)}" data-count="${m.id}" type="number" min="0" step="1" value="${displayed}" placeholder="Minutos"><select aria-label="Unidad de tiempo" data-unit="${m.id}"><option value="minutes" ${unit==='minutes'?'selected':''}>Minutos</option><option value="hours" ${unit==='hours'?'selected':''}>Horas</option><option value="days" ${unit==='days'?'selected':''}>Días</option></select><button class="small secondary" type="button" data-plus="${m.id}">+1</button></div><div class="help">La unidad elegida se convierte automáticamente a minutos.</div>`;
+ } else {
+   controls=`<div class="mission-controls"><input aria-label="Cantidad para ${escapeHtml(m.name)}" data-count="${m.id}" type="number" min="0" step="1" value="${count}" placeholder="Cantidad"><button class="small secondary" type="button" data-minus="${m.id}">−1</button><button class="small" type="button" data-plus="${m.id}">+1</button></div>`;
+ }
+ return `<article class="mission"><div class="mission-title">${escapeHtml(m.name)}</div><div class="mission-desc">${escapeHtml(m.desc||((m.points||0)+' puntos por acción.'))}</div>${controls}<div class="points" data-points="${m.id}">${fmt(missionPoints(m))} puntos</div></article>`;
+}
+function renderAscension(){
+ const a=state.ascension;
+ const difference=Number(a.to)>=Number(a.from)?LEVEL_POINTS[Number(a.to)]-LEVEL_POINTS[Number(a.from)]:0;
+ return `<section class="panel"><h3>Calculadora de ascenso de unidades</h3><div class="inline-note">Los puntos de ascenso son la diferencia entre el valor del nivel final y el nivel inicial. Ejemplo: nivel 6 → nivel 8 = 150 − 50 = 100 puntos por unidad.</div><div class="calc-grid"><div class="field"><label for="ascFrom">Nivel inicial</label><select id="ascFrom">${Object.keys(LEVEL_POINTS).map(n=>`<option value="${n}" ${Number(a.from)===Number(n)?'selected':''}>Nivel ${n} · ${LEVEL_POINTS[n]} pts</option>`).join('')}</select></div><div class="field"><label for="ascTo">Nivel final</label><select id="ascTo">${Object.keys(LEVEL_POINTS).map(n=>`<option value="${n}" ${Number(a.to)===Number(n)?'selected':''}>Nivel ${n} · ${LEVEL_POINTS[n]} pts</option>`).join('')}</select></div><div class="field"><label for="ascAmount">Unidades ascendidas</label><input id="ascAmount" type="number" min="0" step="1" value="${safeNumber(a.amount)}"></div></div><div class="points" id="ascensionResult">${Number(a.to)<Number(a.from)?'El nivel final debe ser igual o superior al inicial.':fmt(difference*safeNumber(a.amount))+' puntos de ascenso'}</div><div class="help">Este resultado se suma al Día 5. Si el nivel final es inferior al inicial, no se cuentan puntos.</div></section>`;
+}
+function renderDay(){
+ const d=DAYS[state.activeDay];
+ renderTabs();
+ let extra='';
+ if(state.activeDay===0){
+   extra=`<section class="panel"><h3>Calculadora de tribus y resistencia</h3><div class="calc-grid"><div class="field"><label for="tribeCost">Coste de resistencia por tribu</label><input id="tribeCost" type="number" min="0" step="1" value="${safeNumber(state.tribeResistanceCost)}"></div><div class="field"><label for="resistanceAvailable">Resistencia disponible (opcional)</label><input id="resistanceAvailable" type="number" min="0" step="1" value="${state.resistanceAvailable===''?'':safeNumber(state.resistanceAvailable)}" placeholder="Ej. 2500"></div><div class="field"><label>Objetivo personal</label><div class="stat"><div class="value" style="font-size:20px">${fmt(safeNumber(state.goal))}</div><div class="label">puntos</div></div></div></div><div class="dashboard-grid" style="margin-top:10px"><div class="stat"><div class="label">Tribus nivel 29+ para el objetivo</div><div class="value" id="tribesNeeded">—</div></div><div class="stat"><div class="label">Puntos con esas tribus</div><div class="value" id="tribePointsNeeded">—</div></div><div class="stat"><div class="label">Resistencia necesaria</div><div class="value" id="resistanceNeeded">—</div></div><div class="stat"><div class="label">Balance de resistencia</div><div class="value" id="resistanceBalance">—</div></div></div><div class="help">El cálculo estima tribus de nivel 29 o superior a 300 puntos cada una. El coste inicial es 5 de resistencia por tribu, editable.</div></section>`;
+ }
+ if(state.activeDay===4)extra+=renderAscension();
+ $('dayContent').innerHTML=`<section class="panel"><div class="day-heading"><div><h2>${d.short} — ${escapeHtml(d.name)}</h2><p>${escapeHtml(d.description)}</p></div><div class="day-total" data-day-total>${fmt(dayPoints(state.activeDay))} puntos</div></div><div class="mission-list">${d.missions.map(missionCard).join('')}</div></section>${extra}`;
+ updateDaySpecials();
+}
+function updateDaySpecials(){
+ if(state.activeDay===0){
+   const goal=safeNumber(state.goal),perTribe=300,cost=safeNumber(state.tribeResistanceCost);
+   const tribes=goal>0?Math.ceil(goal/perTribe):0,points=tribes*perTribe,res=tribes*cost;
+   $('tribesNeeded').textContent=fmt(tribes);$('tribePointsNeeded').textContent=fmt(points);$('resistanceNeeded').textContent=fmt(res);
+   const available=state.resistanceAvailable===''?null:safeNumber(state.resistanceAvailable);
+   $('resistanceBalance').textContent=available===null?'No indicado':fmt(available-res);
+   $('resistanceBalance').style.color=available===null?'var(--gold2)':(available>=res?'var(--green)':'var(--red)');
+ }
+ if(state.activeDay===4&&$('ascensionResult')){
+   const a=state.ascension,from=Number(a.from),to=Number(a.to);
+   $('ascensionResult').textContent=to<from?'El nivel final debe ser igual o superior al inicial.':fmt(ascensionPoints())+' puntos de ascenso';
+ }
+}
+function renderAll(){renderTabs();renderDay();updateDashboard()}
+function refreshPoints(){
+ document.querySelectorAll('[data-points]').forEach(el=>{
+  const id=el.getAttribute('data-points');let m=null;
+  for(const d of DAYS){m=d.missions.find(x=>x.id===id);if(m)break;}
+  if(m)el.textContent=fmt(missionPoints(m))+' puntos';
+ });
+ const totalEl=$('dayContent').querySelector('[data-day-total]');
+ if(totalEl)totalEl.textContent=fmt(dayPoints(state.activeDay))+' puntos';
+ updateDashboard();updateDaySpecials();saveState();
+}
+function setCount(id,value){state.counts[id]=Math.max(0,Math.floor(safeNumber(value)))}
+$('goal').addEventListener('input',e=>{state.goal=safeNumber(e.target.value);$('preset').value='';refreshPoints()});
+$('preset').addEventListener('change',e=>{if(e.target.value!==''){state.goal=safeNumber(e.target.value);$('goal').value=state.goal;refreshPoints()}});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-goto]');if(!b)return;state.activeDay=Number(b.dataset.goto);saveState();renderAll()});
+$('daySummary').addEventListener('click',e=>{const b=e.target.closest('[data-goto]');if(!b)return;state.activeDay=Number(b.dataset.goto);saveState();renderAll()});
+$('dayContent').addEventListener('input',e=>{
+ const t=e.target;
+ if(t.matches('[data-count]')){const id=t.dataset.count;const mission=DAYS.flatMap(d=>d.missions).find(m=>m.id===id);if(mission&&mission.type==='speedup'){state.counts[id]=Math.max(0,Number(t.value)||0)}else{setCount(id,t.value)}refreshPoints()}
+ else if(t.id==='tribeCost'){state.tribeResistanceCost=safeNumber(t.value);updateDaySpecials();saveState()}
+ else if(t.id==='resistanceAvailable'){state.resistanceAvailable=t.value===''?'':safeNumber(t.value);updateDaySpecials();saveState()}
+ else if(t.id==='ascAmount'){state.ascension.amount=safeNumber(t.value);refreshPoints()}
+});
+$('dayContent').addEventListener('change',e=>{
+ const t=e.target;
+ if(t.matches('[data-unit]')){const id=t.dataset.unit;const oldUnit=state.counts[id+'_unit']||'minutes';const newUnit=t.value;const raw=safeNumber(state.counts[id]);const factors={minutes:1,hours:60,days:1440};const converted=raw*factors[oldUnit]/factors[newUnit];state.counts[id]=Math.round(converted*100)/100;state.counts[id+'_unit']=newUnit;renderDay();saveState()}
+ else if(t.id==='ascFrom'){state.ascension.from=Number(t.value);refreshPoints();renderDay()}
+ else if(t.id==='ascTo'){state.ascension.to=Number(t.value);refreshPoints();renderDay()}
+});
+$('dayContent').addEventListener('click',e=>{
+ const plus=e.target.closest('[data-plus]'),minus=e.target.closest('[data-minus]');
+ if(plus){const id=plus.dataset.plus;const mission=DAYS.flatMap(d=>d.missions).find(m=>m.id===id);if(mission&&mission.type==='speedup'){state.counts[id]=Math.max(0,(Number(state.counts[id])||0)+1)}else{setCount(id,getCount(id)+1)}const input=$(`count-${id}`)||document.querySelector(`[data-count="${id}"]`);if(input)input.value=state.counts[id];refreshPoints()}
+ if(minus){const id=minus.dataset.minus;setCount(id,Math.max(0,getCount(id)-1));const input=document.querySelector(`[data-count="${id}"]`);if(input)input.value=state.counts[id];refreshPoints()}
+});
+$('resetBtn').addEventListener('click',()=>{
+ if(!confirm('¿Seguro que quieres iniciar un evento nuevo? Se borrarán el objetivo, todas las cantidades y los cálculos guardados en este navegador.'))return;
+ state=freshState();
+ try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+ saveState();renderAll();
+});
+loadState();
+$('goal').value=state.goal;
+renderAll();
+</script>
+</body>
+</html>
