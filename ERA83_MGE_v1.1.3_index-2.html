@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11100e">
+<title>ERA 83 — MGE Calculator v1.1</title>
+<style>
+:root{--bg:#11100e;--panel:#1b1915;--panel2:#242119;--gold:#d9b45b;--gold2:#f3d98b;--text:#f4f0e5;--muted:#b6ad98;--line:#4a4028;--green:#9fcb8a;--red:#ef9a90}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#292316 0,#11100e 58%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1180px;margin:auto;padding:16px}
+header{display:flex;align-items:center;gap:14px;padding:18px 0 22px;border-bottom:1px solid var(--line);margin-bottom:18px;flex-wrap:wrap}.language-box{margin-left:auto;min-width:155px}.language-box label{display:block;margin-bottom:5px}.language-box select{padding:8px}
+.crest{width:200px;height:200px;flex:0 0 200px;object-fit:contain;border-radius:12px;box-shadow:0 0 22px #d9b45b20}
+h1{font:700 clamp(24px,4vw,36px)/1.1 Georgia,serif;letter-spacing:2px;color:var(--gold2);margin:0}
+.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
+header .edition{color:var(--gold);border:1px solid var(--line);padding:7px 10px;border-radius:9px;font-size:12px;white-space:nowrap}
+h2,h3{font-family:Georgia,serif;color:var(--gold2)}
+h2{font-size:23px;margin:0 0 12px}h3{font-size:17px;margin:0 0 9px}
+.panel{background:linear-gradient(145deg,#211e17,#171612);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 8px 24px #0002}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:#11100dcc;border:1px solid #3d3525;border-radius:11px;padding:12px}
+.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:clamp(18px,2.5vw,27px);font-weight:750;color:var(--gold2);overflow-wrap:anywhere;margin-top:4px}
+.progress-track{height:12px;background:#0d0c0a;border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:12px 0 5px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#8f6a21,var(--gold2));transition:width .2s}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:5px;min-width:130px;flex:1}
+label{font-size:12px;color:var(--muted)}
+input,select{width:100%;background:#100f0d;color:var(--text);border:1px solid #51452c;border-radius:8px;padding:10px;min-width:0}
+input:focus,select:focus{outline:2px solid #d9b45b66;border-color:var(--gold)}
+button{border:1px solid #8e7135;background:#3a2e17;color:var(--gold2);border-radius:8px;padding:9px 12px;font-weight:650}
+button:hover{background:#4b3b1d}
+button.secondary{background:#201e19;border-color:#514a3b;color:var(--text)}
+button.danger{border-color:#8b4138;background:#3a1d1a;color:#ffd1ca}
+button.small{padding:6px 9px;font-size:13px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 12px;margin-bottom:6px;scrollbar-width:thin}
+.tab{white-space:nowrap;background:#1c1a15;border-color:#51452c}
+.tab.active{background:linear-gradient(135deg,#8d6a25,#4a3716);border-color:var(--gold2);color:#fff4ce}
+.day-heading{display:flex;justify-content:space-between;gap:12px;align-items:start;flex-wrap:wrap;margin-bottom:14px}
+.day-heading p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.day-total{border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--gold2);white-space:nowrap}
+.mission-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mission{background:#12110f;border:1px solid #3c3425;border-radius:11px;padding:12px;min-width:0}
+.mission-title{font-weight:700;margin-bottom:5px}
+.mission-desc{font-size:12px;color:var(--muted);margin-bottom:10px}
+.mission-controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center}
+.mission-controls input{padding:9px}
+.points{color:var(--gold2);font-weight:750;text-align:right;margin-top:8px;font-size:14px}
+.help{font-size:12px;color:var(--muted);margin-top:8px}
+.inline-note{padding:10px 12px;background:#211e16;border-left:3px solid var(--gold);border-radius:5px;color:#ddd2b8;font-size:13px;margin:10px 0}
+.calc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.day-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.day-link{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#13120f;border:1px solid #3d3525;border-radius:9px;padding:10px;text-align:left;color:var(--text)}
+.day-link span:last-child{color:var(--gold2);font-weight:700;white-space:nowrap}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:14px 10px 24px;line-height:1.65;border-top:1px solid #b9974b33;margin-top:18px} .copyright-title{color:var(--gold,#c9a44c);font-weight:700;margin-bottom:5px}.copyright-note{max-width:900px;margin:4px auto 0;font-size:11px;opacity:.9}
+.hidden{display:none!important}
+.status{font-size:12px;color:var(--green);min-height:18px}
+@media(max-width:760px){.crest{width:150px;height:150px;flex-basis:150px}.dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mission-list{grid-template-columns:1fr}.calc-grid{grid-template-columns:1fr}.wrap{padding:11px}.panel{padding:13px}header .edition{display:none}.language-box{margin-left:0;flex:1;min-width:130px}.crest{width:150px;height:150px;flex-basis:150px}.day-list{grid-template-columns:1fr}}
+@media(min-width:761px) and (max-width:980px){.mission-list{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <img class="crest" src="data:image/jpeg;base64,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" alt="Logo ERA 83">
+  <div><h1>ERA 83</h1><div class="subtitle">MGE CALCULATOR · GOBERNADOR MÁS PODEROSO</div></div>
+  <div class="language-box"><label for="languageSelect" id="languageLabel">Idioma / Language</label><select id="languageSelect" aria-label="Seleccionar idioma"></select></div><div class="edition">VERSIÓN 1.1</div>
+</header>
+
+<section class="panel">
+  <div class="toolbar"><h2>Panel de mando</h2><div class="status" id="saveStatus" aria-live="polite">Guardado local activado</div></div>
+  <div class="row" style="margin-bottom:13px">
+    <div class="field" style="max-width:310px"><label for="goal">Objetivo personal de puntos</label><input id="goal" type="number" min="0" step="1" value="200000"></div>
+    <div class="field" style="max-width:200px"><label for="preset">Objetivos rápidos</label><select id="preset"><option value="">Elegir objetivo…</option><option value="50000">50.000</option><option value="100000">100.000</option><option value="200000">200.000</option><option value="300000">300.000</option><option value="500000">500.000</option></select></div>
+    <button id="resetBtn" class="danger" type="button">Nuevo evento / Reiniciar</button>
+  </div>
+  <div class="dashboard-grid">
+    <div class="stat"><div class="label">Puntos acumulados</div><div class="value" id="totalPoints">0</div></div>
+    <div class="stat"><div class="label">Puntos restantes</div><div class="value" id="remainingPoints">200.000</div></div>
+    <div class="stat"><div class="label">Progreso del objetivo</div><div class="value" id="progressText">0%</div></div>
+    <div class="stat"><div class="label">Jornadas con puntos</div><div class="value" id="daysActive">0 / 7</div></div>
+  </div>
+  <div class="progress-track" role="progressbar" aria-label="Progreso del objetivo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="help">Los datos se guardan automáticamente en este navegador y dispositivo. No se sincronizan entre dispositivos ni se envían a un servidor.</div>
+</section>
+
+<section class="panel">
+  <h2>Resumen de las siete jornadas</h2>
+  <div id="daySummary" class="day-list"></div>
+</section>
+
+<nav class="tabs" id="tabs" aria-label="Jornadas del evento"></nav>
+<main id="dayContent"></main>
+
+<footer id="siteFooter"><div class="copyright-title" id="copyrightTitle">© 2026 ERA 83 — MGE Calculator. Todos los derechos reservados.</div><div id="copyrightIndependence">Herramienta independiente creada para la comunidad de Age of Empires Mobile.</div><div class="copyright-note" id="copyrightRestriction">Queda prohibida la reproducción, distribución o modificación de los contenidos y del código original de este proyecto sin autorización de sus respectivos titulares, salvo en los casos permitidos por la ley.</div><div class="copyright-note" id="copyrightDisclaimer">Age of Empires Mobile es propiedad de sus respectivos titulares. Esta herramienta es un proyecto independiente y no oficial.</div></footer>
+</div>
+
+<script>
+'use strict';
+const STORAGE_KEY = 'era83_mge_calculator_v1';
+const LEVEL_POINTS = {1:2,2:3,3:5,4:10,5:20,6:50,7:100,8:150,9:200};
+const DAYS = [
+ {name:'Incursión tribal', short:'Día 1', description:'Derrota tribus bárbaras y calcula la resistencia necesaria.', missions:[
+  {id:'tribe_1_4',name:'Tribus de nivel 1–4',desc:'Puntos por tribu derrotada.',points:50},
+  {id:'tribe_5_8',name:'Tribus de nivel 5–8',desc:'Puntos por tribu derrotada.',points:80},
+  {id:'tribe_9_12',name:'Tribus de nivel 9–12',desc:'Puntos por tribu derrotada.',points:100},
+  {id:'tribe_13_16',name:'Tribus de nivel 13–16',desc:'Puntos por tribu derrotada.',points:150},
+  {id:'tribe_17_20',name:'Tribus de nivel 17–20',desc:'Puntos por tribu derrotada.',points:180},
+  {id:'tribe_21_24',name:'Tribus de nivel 21–24',desc:'Puntos por tribu derrotada.',points:220},
+  {id:'tribe_25_28',name:'Tribus de nivel 25–28',desc:'Puntos por tribu derrotada.',points:260},
+  {id:'tribe_29_plus',name:'Tribus de nivel 29 o superior',desc:'Puntos por tribu derrotada.',points:300}
+ ]},
+ {name:'Crecimiento del héroe',short:'Día 2',description:'Equipo, medallas y pergaminos de habilidad.',missions:[
+  {id:'rare_gear',name:'Crear equipo raro',desc:'Por pieza creada.',points:1000},
+  {id:'epic_gear',name:'Crear equipo épico',desc:'Por pieza creada.',points:5000},
+  {id:'legendary_gear',name:'Crear equipo legendario',desc:'Por pieza creada.',points:30000},
+  {id:'epic_medal',name:'Usar medalla de héroe épica exclusiva',desc:'Por medalla usada.',points:500},
+  {id:'legendary_medal',name:'Usar medalla de héroe legendaria exclusiva',desc:'Por medalla usada.',points:2500},
+  {id:'epic_scroll',name:'Usar pergamino de habilidad épica universal',desc:'Por pergamino usado.',points:350},
+  {id:'legendary_scroll',name:'Usar pergamino de habilidad legendaria universal',desc:'Por pergamino usado.',points:2000}
+ ]},
+ {name:'Recolección de recursos',short:'Día 3',description:'Introduce las unidades recolectadas. Los recursos normales puntúan por cada bloque completo de 100.',missions:[
+  {id:'wood',name:'Recolectar madera',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'food',name:'Recolectar alimento',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'stone',name:'Recolectar piedra',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'gold',name:'Recolectar oro',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'primordial_dew',name:'Conseguir rocío primordial',desc:'12 puntos por unidad.',points:12},
+  {id:'legendary_wheel',name:'Girar Advenimiento legendario',desc:'Por giro de ruleta.',points:1000}
+ ]},
+ {name:'Contrarreloj',short:'Día 4',description:'Aceleradores, Arte delicado y materiales de mejora.',missions:[
+  {id:'build_speedup',name:'Aceleradores de construcción',desc:'30 puntos por minuto consumido.',type:'speedup'},
+  {id:'research_speedup',name:'Aceleradores de investigación',desc:'30 puntos por minuto consumido.',type:'speedup'},
+  {id:'delicate_art',name:'Crear en Arte delicado',desc:'Por creación.',points:2000},
+  {id:'copper_sand',name:'Usar arena cobriza',desc:'Por unidad usada para mejorar anillos de sello.',points:400},
+  {id:'silver_sand',name:'Usar arena plateada',desc:'Por unidad usada para mejorar anillos de sello.',points:1000},
+  {id:'fine_gold',name:'Usar oro fino',desc:'Por unidad usada para mejorar anillos de sello.',points:3000},
+  {id:'meteorite_steel',name:'Usar acero meteorito',desc:'Por unidad usada para mejorar anillos de sello.',points:20000}
+ ]},
+ {name:'Entrenamiento de unidades',short:'Día 5',description:'Entrenamiento por nivel y calculadora de ascenso de unidades.',missions:[
+  {id:'train_1',name:'Entrenar unidades de nivel 1',desc:'2 puntos por unidad.',points:2},
+  {id:'train_2',name:'Entrenar unidades de nivel 2',desc:'3 puntos por unidad.',points:3},
+  {id:'train_3',name:'Entrenar unidades de nivel 3',desc:'5 puntos por unidad.',points:5},
+  {id:'train_4',name:'Entrenar unidades de nivel 4',desc:'10 puntos por unidad.',points:10},
+  {id:'train_5',name:'Entrenar unidades de nivel 5',desc:'20 puntos por unidad.',points:20},
+  {id:'train_6',name:'Entrenar unidades de nivel 6',desc:'50 puntos por unidad.',points:50},
+  {id:'train_7',name:'Entrenar unidades de nivel 7',desc:'100 puntos por unidad.',points:100},
+  {id:'train_8',name:'Entrenar unidades de nivel 8',desc:'150 puntos por unidad.',points:150},
+  {id:'train_9',name:'Entrenar unidades de nivel 9',desc:'200 puntos por unidad.',points:200}
+ ]},
+ {name:'Aumento de poder',short:'Día 6',description:'Introduce el poder ganado por cada actividad.',missions:[
+  {id:'power_building',name:'Poder ganado con construcción',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'power_research',name:'Poder ganado con investigación',desc:'6 puntos por cada 1 de poder ganado.',points:6},
+  {id:'power_training',name:'Poder ganado con entrenamiento',desc:'3 puntos por cada 1 de poder ganado.',points:3}
+ ]},
+ {name:'Ir a por todo',short:'Día 7',description:'Lista de misiones indicada para el último día del evento.',missions:[
+  {id:'d7_tribe_1_4',name:'Tribus de nivel 1–4',desc:'Puntos por tribu derrotada.',points:50},
+  {id:'d7_tribe_5_8',name:'Tribus de nivel 5–8',desc:'Puntos por tribu derrotada.',points:80},
+  {id:'d7_tribe_9_12',name:'Tribus de nivel 9–12',desc:'Puntos por tribu derrotada.',points:100},
+  {id:'d7_tribe_13_16',name:'Tribus de nivel 13–16',desc:'Puntos por tribu derrotada.',points:150},
+  {id:'d7_tribe_17_20',name:'Tribus de nivel 17–20',desc:'Puntos por tribu derrotada.',points:180},
+  {id:'d7_tribe_21_24',name:'Tribus de nivel 21–24',desc:'Puntos por tribu derrotada.',points:220},
+  {id:'d7_tribe_25_28',name:'Tribus de nivel 25–28',desc:'Puntos por tribu derrotada.',points:260},
+  {id:'d7_tribe_29_plus',name:'Tribus de nivel 29 o superior',desc:'Puntos por tribu derrotada.',points:300},
+  {id:'d7_wood',name:'Recolectar madera',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_food',name:'Recolectar alimento',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_stone',name:'Recolectar piedra',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_gold',name:'Recolectar oro',desc:'Cada 100 unidades = 1 punto.',type:'resource100'},
+  {id:'d7_delicate_art',name:'Crear en Arte delicado',desc:'Por creación.',points:2000},
+  {id:'d7_copper_sand',name:'Usar arena cobriza',desc:'Por unidad usada.',points:400},
+  {id:'d7_silver_sand',name:'Usar arena plateada',desc:'Por unidad usada.',points:1000},
+  {id:'d7_fine_gold',name:'Usar oro fino',desc:'Por unidad usada.',points:3000},
+  {id:'d7_meteorite_steel',name:'Usar acero meteorito',desc:'Por unidad usada.',points:20000},
+  {id:'d7_power_building',name:'Poder ganado con construcción',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'d7_power_research',name:'Poder ganado con investigación',desc:'6 puntos por cada 1 de poder ganado.',points:6},
+  {id:'d7_power_training',name:'Poder ganado con entrenamiento',desc:'3 puntos por cada 1 de poder ganado.',points:3},
+  {id:'d7_legendary_wheel',name:'Girar Advenimiento legendario',desc:'Por giro de ruleta.',points:1000},
+  {id:'d7_epic_medal',name:'Usar medalla de héroe épica exclusiva',desc:'Por medalla usada.',points:500},
+  {id:'d7_legendary_medal',name:'Usar medalla de héroe legendaria exclusiva',desc:'Por medalla usada.',points:2500},
+  {id:'d7_epic_scroll',name:'Usar pergamino de habilidad épica universal',desc:'Por pergamino usado.',points:350},
+  {id:'d7_legendary_scroll',name:'Usar pergamino de habilidad legendaria universal',desc:'Por pergamino usado.',points:2000}
+ ]}
+];
+
+function freshState(){return {goal:200000,activeDay:0,counts:{},tribeResistanceCost:5,resistanceAvailable:'',ascension:{from:6,to:8,amount:0}}}
+let state=freshState();
+const $=id=>document.getElementById(id);
+const fmt=n=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
+function safeNumber(value){const n=Number(value);return Number.isFinite(n)&&n>0?n:0}
+function getCount(id){return safeNumber(state.counts[id])}
+function saveState(showStatus=true){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));if(showStatus){$('saveStatus').textContent=tr('saved');}}
+ catch(e){$('saveStatus').textContent=tr('saveError');}
+}
+function loadState(){
+ try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const parsed=JSON.parse(raw);state={...freshState(),...parsed,counts:parsed.counts&&typeof parsed.counts==='object'?parsed.counts:{},ascension:{...freshState().ascension,...(parsed.ascension||{})}};}}
+ catch(e){state=freshState();}
+}
+function missionPoints(m){
+ const count=getCount(m.id);
+ if(m.type==='resource100') return Math.floor(count/100);
+ if(m.type==='speedup'){const unit=state.counts[m.id+'_unit']||'minutes';const factor={minutes:1,hours:60,days:1440}[unit]||1;return count*factor*30;}
+ return count*(m.points||0);
+}
+function dayPoints(dayIndex){return DAYS[dayIndex].missions.reduce((sum,m)=>sum+missionPoints(m),0)+(dayIndex===4?ascensionPoints():0)}
+function totalPoints(){return DAYS.reduce((sum,d,i)=>sum+dayPoints(i),0)}
+function ascensionPoints(){
+ const a=state.ascension||{from:6,to:8,amount:0};
+ const from=Number(a.from),to=Number(a.to),amount=safeNumber(a.amount);
+ if(!LEVEL_POINTS[from]||!LEVEL_POINTS[to]||to<from)return 0;
+ return (LEVEL_POINTS[to]-LEVEL_POINTS[from])*amount;
+}
+function updateDashboard(){
+ const total=totalPoints(),goal=safeNumber(state.goal),remaining=Math.max(0,goal-total),pct=goal>0?total/goal*100:(total>0?100:0);
+ $('totalPoints').textContent=fmt(total);$('remainingPoints').textContent=fmt(remaining);$('progressText').textContent=fmt(pct)+'%';
+ $('progressFill').style.width=Math.min(100,pct)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.min(100,pct)));
+ $('daysActive').textContent=DAYS.filter((d,i)=>dayPoints(i)>0).length+' / 7';
+ $('goal').value=state.goal;
+ renderSummary();
+ const heading=$('dayContent').querySelector('[data-day-total]');
+ if(heading)heading.textContent=fmt(dayPoints(state.activeDay))+' puntos';
+}
+function renderSummary(){
+ $('daySummary').innerHTML=DAYS.map((d,i)=>`<button type="button" class="day-link" data-goto="${i}"><span>${d.short} · ${escapeHtml(d.name)}</span><span>${fmt(dayPoints(i))} pts ›</span></button>`).join('');
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderTabs(){
+ $('tabs').innerHTML=DAYS.map((d,i)=>`<button type="button" class="tab ${i===state.activeDay?'active':''}" data-goto="${i}">${d.short}</button>`).join('');
+}
+function missionCard(m){
+ const count=getCount(m.id);
+ let controls='';
+ if(m.type==='speedup'){
+   const unit=state.counts[m.id+'_unit']||'minutes';
+   const displayed=count;
+   controls=`<div class="mission-controls"><input aria-label="Cantidad para ${escapeHtml(m.name)}" data-count="${m.id}" type="number" min="0" step="1" value="${displayed}" placeholder="Minutos"><select aria-label="Unidad de tiempo" data-unit="${m.id}"><option value="minutes" ${unit==='minutes'?'selected':''}>Minutos</option><option value="hours" ${unit==='hours'?'selected':''}>Horas</option><option value="days" ${unit==='days'?'selected':''}>Días</option></select><button class="small secondary" type="button" data-plus="${m.id}">+1</button></div><div class="help">La unidad elegida se convierte automáticamente a minutos.</div>`;
+ } else {
+   controls=`<div class="mission-controls"><input aria-label="Cantidad para ${escapeHtml(m.name)}" data-count="${m.id}" type="number" min="0" step="1" value="${count}" placeholder="Cantidad"><button class="small secondary" type="button" data-minus="${m.id}">−1</button><button class="small" type="button" data-plus="${m.id}">+1</button></div>`;
+ }
+ return `<article class="mission"><div class="mission-title">${escapeHtml(m.name)}</div><div class="mission-desc">${escapeHtml(m.desc||((m.points||0)+' puntos por acción.'))}</div>${controls}<div class="points" data-points="${m.id}">${fmt(missionPoints(m))} puntos</div></article>`;
+}
+function renderAscension(){
+ const a=state.ascension;
+ const difference=Number(a.to)>=Number(a.from)?LEVEL_POINTS[Number(a.to)]-LEVEL_POINTS[Number(a.from)]:0;
+ return `<section class="panel"><h3>Calculadora de ascenso de unidades</h3><div class="inline-note">Los puntos de ascenso son la diferencia entre el valor del nivel final y el nivel inicial. Ejemplo: nivel 6 → nivel 8 = 150 − 50 = 100 puntos por unidad.</div><div class="calc-grid"><div class="field"><label for="ascFrom">Nivel inicial</label><select id="ascFrom">${Object.keys(LEVEL_POINTS).map(n=>`<option value="${n}" ${Number(a.from)===Number(n)?'selected':''}>Nivel ${n} · ${LEVEL_POINTS[n]} pts</option>`).join('')}</select></div><div class="field"><label for="ascTo">Nivel final</label><select id="ascTo">${Object.keys(LEVEL_POINTS).map(n=>`<option value="${n}" ${Number(a.to)===Number(n)?'selected':''}>Nivel ${n} · ${LEVEL_POINTS[n]} pts</option>`).join('')}</select></div><div class="field"><label for="ascAmount">Unidades ascendidas</label><input id="ascAmount" type="number" min="0" step="1" value="${safeNumber(a.amount)}"></div></div><div class="points" id="ascensionResult">${Number(a.to)<Number(a.from)?'El nivel final debe ser igual o superior al inicial.':fmt(difference*safeNumber(a.amount))+' puntos de ascenso'}</div><div class="help">Este resultado se suma al Día 5. Si el nivel final es inferior al inicial, no se cuentan puntos.</div></section>`;
+}
+function renderDay(){
+ const d=DAYS[state.activeDay];
+ renderTabs();
+ let extra='';
+ if(state.activeDay===0){
+   extra=`<section class="panel"><h3>Calculadora de tribus y resistencia</h3><div class="calc-grid"><div class="field"><label for="tribeCost">Coste de resistencia por tribu</label><input id="tribeCost" type="number" min="0" step="1" value="${safeNumber(state.tribeResistanceCost)}"></div><div class="field"><label for="resistanceAvailable">Resistencia disponible (opcional)</label><input id="resistanceAvailable" type="number" min="0" step="1" value="${state.resistanceAvailable===''?'':safeNumber(state.resistanceAvailable)}" placeholder="Ej. 2500"></div><div class="field"><label>Objetivo personal</label><div class="stat"><div class="value" style="font-size:20px">${fmt(safeNumber(state.goal))}</div><div class="label">puntos</div></div></div></div><div class="dashboard-grid" style="margin-top:10px"><div class="stat"><div class="label">Tribus posibles con tu resistencia</div><div class="value" id="tribesAvailable">—</div></div><div class="stat"><div class="label">Puntos máximos con tu resistencia</div><div class="value" id="pointsAvailable">—</div></div><div class="stat"><div class="label">Tribus nivel 29+ para el objetivo</div><div class="value" id="tribesNeeded">—</div></div><div class="stat"><div class="label">Puntos con esas tribus</div><div class="value" id="tribePointsNeeded">—</div></div><div class="stat"><div class="label">Resistencia necesaria para el objetivo</div><div class="value" id="resistanceNeeded">—</div></div><div class="stat"><div class="label">Balance tras alcanzar el objetivo</div><div class="value" id="resistanceBalance">—</div></div></div><div class="help">Las tribus de nivel 29 o superior dan 300 puntos cada una. La calculadora estima cuántas puedes derrotar con la resistencia disponible y compara el resultado con tu objetivo personal. El coste por tribu es editable.</div></section>`;
+ }
+ if(state.activeDay===4)extra+=renderAscension();
+ $('dayContent').innerHTML=`<section class="panel"><div class="day-heading"><div><h2>${d.short} — ${escapeHtml(d.name)}</h2><p>${escapeHtml(d.description)}</p></div><div class="day-total" data-day-total>${fmt(dayPoints(state.activeDay))} puntos</div></div><div class="mission-list">${d.missions.map(missionCard).join('')}</div></section>${extra}`;
+ updateDaySpecials();
+}
+function updateDaySpecials(){
+ if(state.activeDay===0){
+   const goal=safeNumber(state.goal),perTribe=300,cost=safeNumber(state.tribeResistanceCost);
+   const tribes=goal>0?Math.ceil(goal/perTribe):0,points=tribes*perTribe,res=tribes*cost;
+   $('tribesNeeded').textContent=fmt(tribes);$('tribePointsNeeded').textContent=fmt(points);$('resistanceNeeded').textContent=fmt(res);
+   const available=state.resistanceAvailable===''?null:Math.max(0,safeNumber(state.resistanceAvailable));
+   const affordable=available===null||cost<=0?null:Math.floor(available/cost);
+   $('tribesAvailable').textContent=affordable===null?'—':fmt(affordable);
+   $('pointsAvailable').textContent=affordable===null?'—':fmt(affordable*perTribe);
+   $('resistanceBalance').textContent=available===null?'Introduce tu resistencia':fmt(available-res);
+   $('resistanceBalance').style.color=available===null?'var(--gold2)':(available>=res?'var(--green)':'var(--red)');
+   $('pointsAvailable').style.color=affordable===null?'var(--gold2)':(affordable*perTribe>=goal?'var(--green)':'var(--red)');
+ }
+ if(state.activeDay===4&&$('ascensionResult')){
+   const a=state.ascension,from=Number(a.from),to=Number(a.to);
+   $('ascensionResult').textContent=to<from?'El nivel final debe ser igual o superior al inicial.':fmt(ascensionPoints())+' puntos de ascenso';
+ }
+}
+function renderAll(){renderTabs();renderDay();updateDashboard()}
+function refreshPoints(){
+ document.querySelectorAll('[data-points]').forEach(el=>{
+  const id=el.getAttribute('data-points');let m=null;
+  for(const d of DAYS){m=d.missions.find(x=>x.id===id);if(m)break;}
+  if(m)el.textContent=fmt(missionPoints(m))+' puntos';
+ });
+ const totalEl=$('dayContent').querySelector('[data-day-total]');
+ if(totalEl)totalEl.textContent=fmt(dayPoints(state.activeDay))+' puntos';
+ updateDashboard();updateDaySpecials();saveState();
+}
+function setCount(id,value){state.counts[id]=Math.max(0,Math.floor(safeNumber(value)))}
+$('goal').addEventListener('input',e=>{state.goal=safeNumber(e.target.value);$('preset').value='';refreshPoints()});
+$('preset').addEventListener('change',e=>{if(e.target.value!==''){state.goal=safeNumber(e.target.value);$('goal').value=state.goal;refreshPoints()}});
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-goto]');if(!b)return;state.activeDay=Number(b.dataset.goto);saveState();renderAll()});
+$('daySummary').addEventListener('click',e=>{const b=e.target.closest('[data-goto]');if(!b)return;state.activeDay=Number(b.dataset.goto);saveState();renderAll()});
+$('dayContent').addEventListener('input',e=>{
+ const t=e.target;
+ if(t.matches('[data-count]')){const id=t.dataset.count;const mission=DAYS.flatMap(d=>d.missions).find(m=>m.id===id);if(mission&&mission.type==='speedup'){state.counts[id]=Math.max(0,Number(t.value)||0)}else{setCount(id,t.value)}refreshPoints()}
+ else if(t.id==='tribeCost'){state.tribeResistanceCost=safeNumber(t.value);updateDaySpecials();saveState()}
+ else if(t.id==='resistanceAvailable'){state.resistanceAvailable=t.value===''?'':safeNumber(t.value);updateDaySpecials();saveState()}
+ else if(t.id==='ascAmount'){state.ascension.amount=safeNumber(t.value);refreshPoints()}
+});
+$('dayContent').addEventListener('change',e=>{
+ const t=e.target;
+ if(t.matches('[data-unit]')){const id=t.dataset.unit;const oldUnit=state.counts[id+'_unit']||'minutes';const newUnit=t.value;const raw=safeNumber(state.counts[id]);const factors={minutes:1,hours:60,days:1440};const converted=raw*factors[oldUnit]/factors[newUnit];state.counts[id]=Math.round(converted*100)/100;state.counts[id+'_unit']=newUnit;renderDay();saveState()}
+ else if(t.id==='ascFrom'){state.ascension.from=Number(t.value);refreshPoints();renderDay()}
+ else if(t.id==='ascTo'){state.ascension.to=Number(t.value);refreshPoints();renderDay()}
+});
+$('dayContent').addEventListener('click',e=>{
+ const plus=e.target.closest('[data-plus]'),minus=e.target.closest('[data-minus]');
+ if(plus){const id=plus.dataset.plus;const mission=DAYS.flatMap(d=>d.missions).find(m=>m.id===id);if(mission&&mission.type==='speedup'){state.counts[id]=Math.max(0,(Number(state.counts[id])||0)+1)}else{setCount(id,getCount(id)+1)}const input=$(`count-${id}`)||document.querySelector(`[data-count="${id}"]`);if(input)input.value=state.counts[id];refreshPoints()}
+ if(minus){const id=minus.dataset.minus;setCount(id,Math.max(0,getCount(id)-1));const input=document.querySelector(`[data-count="${id}"]`);if(input)input.value=state.counts[id];refreshPoints()}
+});
+$('resetBtn').addEventListener('click',()=>{
+ if(!confirm(tr('resetConfirm')))return;
+ state=freshState();
+ try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+ saveState();renderAll();
+});
+
+const LANG_STORAGE_KEY = 'era83_mge_language';
+const LANGUAGES = [
+ ['es','🇪🇸 Español'],['en','🇬🇧 English'],['fr','🇫🇷 Français'],['de','🇩🇪 Deutsch'],
+ ['it','🇮🇹 Italiano'],['zh-CN','🇨🇳 中文（简体）'],['zh-TW','🇹🇼 中文（繁體）'],
+ ['pt','🇵🇹 Português'],['pt-BR','🇧🇷 Português do Brasil'],['ru','🇷🇺 Русский'],
+ ['ja','🇯🇵 日本語'],['ko','🇰🇷 한국어'],['tr','🇹🇷 Türkçe'],['pl','🇵🇱 Polski'],
+ ['nl','🇳🇱 Nederlands'],['ar','🇸🇦 العربية'],['id','🇮🇩 Bahasa Indonesia'],
+ ['th','🇹🇭 ไทย'],['vi','🇻🇳 Tiếng Việt'],['uk','🇺🇦 Українська']
+];
+const UI = {
+ es:{language:'Idioma',panel:'Panel de mando',save:'Guardado local activado',goal:'Objetivo personal de puntos',presets:'Objetivos rápidos',choose:'Elegir objetivo…',reset:'Nuevo evento / Reiniciar',total:'Puntos acumulados',remaining:'Puntos restantes',progress:'Progreso del objetivo',daysActive:'Jornadas con puntos',summary:'Resumen de las siete jornadas',saved:'Guardado automáticamente ✓',saveError:'No se pudo guardar en este navegador',points:'puntos',day:'Día',asc:'Calculadora de ascenso de unidades',initial:'Nivel inicial',final:'Nivel final',amount:'Unidades ascendidas',resetConfirm:'¿Seguro que quieres iniciar un evento nuevo? Se borrarán el objetivo, todas las cantidades y los cálculos guardados en este navegador.',footer:'Herramienta personal no oficial.'},
+ en:{language:'Language',panel:'Dashboard',save:'Local saving enabled',goal:'Personal points target',presets:'Quick targets',choose:'Choose target…',reset:'New event / Reset',total:'Total points',remaining:'Points remaining',progress:'Target progress',daysActive:'Days with points',summary:'Seven-day summary',saved:'Automatically saved ✓',saveError:'Could not save in this browser',points:'points',day:'Day',asc:'Unit promotion calculator',initial:'Starting level',final:'Final level',amount:'Units promoted',resetConfirm:'Start a new event? The target, all quantities, and calculations saved in this browser will be erased.',footer:'Unofficial personal tool.'},
+ fr:{language:'Langue',panel:'Tableau de bord',save:'Enregistrement local activé',goal:'Objectif personnel de points',presets:'Objectifs rapides',choose:'Choisir un objectif…',reset:'Nouvel événement / Réinitialiser',total:'Points cumulés',remaining:'Points restants',progress:'Progression de l’objectif',daysActive:'Jours avec des points',summary:'Résumé des sept jours',saved:'Enregistré automatiquement ✓',saveError:'Impossible d’enregistrer dans ce navigateur',points:'points',day:'Jour',asc:'Calculateur de promotion des unités',initial:'Niveau initial',final:'Niveau final',amount:'Unités promues',resetConfirm:'Démarrer un nouvel événement ? L’objectif et les données enregistrées dans ce navigateur seront effacés.',footer:'Outil personnel non officiel.'},
+ de:{language:'Sprache',panel:'Übersicht',save:'Lokales Speichern aktiviert',goal:'Persönliches Punkte-Ziel',presets:'Schnellziele',choose:'Ziel auswählen…',reset:'Neues Event / Zurücksetzen',total:'Gesamtpunkte',remaining:'Verbleibende Punkte',progress:'Zielfortschritt',daysActive:'Tage mit Punkten',summary:'Übersicht der sieben Tage',saved:'Automatisch gespeichert ✓',saveError:'Speichern in diesem Browser fehlgeschlagen',points:'Punkte',day:'Tag',asc:'Einheiten-Aufstiegsrechner',initial:'Ausgangsstufe',final:'Endstufe',amount:'Aufgestiegene Einheiten',resetConfirm:'Neues Event starten? Ziel und gespeicherte Daten in diesem Browser werden gelöscht.',footer:'Inoffizielles persönliches Tool.'},
+ it:{language:'Lingua',panel:'Pannello di controllo',save:'Salvataggio locale attivo',goal:'Obiettivo personale punti',presets:'Obiettivi rapidi',choose:'Scegli obiettivo…',reset:'Nuovo evento / Reimposta',total:'Punti totali',remaining:'Punti rimanenti',progress:'Progresso obiettivo',daysActive:'Giorni con punti',summary:'Riepilogo dei sette giorni',saved:'Salvato automaticamente ✓',saveError:'Impossibile salvare nel browser',points:'punti',day:'Giorno',asc:'Calcolatore promozione unità',initial:'Livello iniziale',final:'Livello finale',amount:'Unità promosse',resetConfirm:'Avviare un nuovo evento? L’obiettivo e i dati salvati in questo browser saranno cancellati.',footer:'Strumento personale non ufficiale.'},
+ 'zh-CN':{language:'语言',panel:'控制面板',save:'本地保存已启用',goal:'个人积分目标',presets:'快速目标',choose:'选择目标…',reset:'新活动 / 重置',total:'累计积分',remaining:'剩余积分',progress:'目标进度',daysActive:'有积分的天数',summary:'七天总览',saved:'已自动保存 ✓',saveError:'无法在此浏览器中保存',points:'积分',day:'第',asc:'部队晋升计算器',initial:'初始等级',final:'最终等级',amount:'晋升部队数量',resetConfirm:'开始新活动？此浏览器中保存的目标和数据将被清除。',footer:'非官方个人工具。'},
+ 'zh-TW':{language:'語言',panel:'控制面板',save:'已啟用本機儲存',goal:'個人積分目標',presets:'快速目標',choose:'選擇目標…',reset:'新活動 / 重設',total:'累計積分',remaining:'剩餘積分',progress:'目標進度',daysActive:'有積分的天數',summary:'七天總覽',saved:'已自動儲存 ✓',saveError:'無法在此瀏覽器中儲存',points:'積分',day:'第',asc:'部隊晉升計算器',initial:'初始等級',final:'最終等級',amount:'晉升部隊數量',resetConfirm:'開始新活動？此瀏覽器中儲存的目標和資料將被清除。',footer:'非官方個人工具。'},
+ pt:{language:'Idioma',panel:'Painel de controlo',save:'Gravação local ativada',goal:'Objetivo pessoal de pontos',presets:'Objetivos rápidos',choose:'Escolher objetivo…',reset:'Novo evento / Reiniciar',total:'Pontos acumulados',remaining:'Pontos restantes',progress:'Progresso do objetivo',daysActive:'Dias com pontos',summary:'Resumo dos sete dias',saved:'Guardado automaticamente ✓',saveError:'Não foi possível guardar neste navegador',points:'pontos',day:'Dia',asc:'Calculadora de promoção de unidades',initial:'Nível inicial',final:'Nível final',amount:'Unidades promovidas',resetConfirm:'Iniciar novo evento? O objetivo e os dados guardados neste navegador serão apagados.',footer:'Ferramenta pessoal não oficial.'},
+ 'pt-BR':{language:'Idioma',panel:'Painel de controle',save:'Salvamento local ativado',goal:'Meta pessoal de pontos',presets:'Metas rápidas',choose:'Escolher meta…',reset:'Novo evento / Reiniciar',total:'Pontos acumulados',remaining:'Pontos restantes',progress:'Progresso da meta',daysActive:'Dias com pontos',summary:'Resumo dos sete dias',saved:'Salvo automaticamente ✓',saveError:'Não foi possível salvar neste navegador',points:'pontos',day:'Dia',asc:'Calculadora de promoção de unidades',initial:'Nível inicial',final:'Nível final',amount:'Unidades promovidas',resetConfirm:'Iniciar novo evento? A meta e os dados salvos neste navegador serão apagados.',footer:'Ferramenta pessoal não oficial.'},
+ ru:{language:'Язык',panel:'Панель управления',save:'Локальное сохранение включено',goal:'Личная цель очков',presets:'Быстрые цели',choose:'Выбрать цель…',reset:'Новое событие / Сброс',total:'Всего очков',remaining:'Осталось очков',progress:'Прогресс цели',daysActive:'Дни с очками',summary:'Итоги семи дней',saved:'Сохранено автоматически ✓',saveError:'Не удалось сохранить в браузере',points:'очков',day:'День',asc:'Калькулятор повышения войск',initial:'Начальный уровень',final:'Конечный уровень',amount:'Повышенные войска',resetConfirm:'Начать новое событие? Цель и сохранённые данные будут удалены.',footer:'Неофициальный личный инструмент.'},
+ ja:{language:'言語',panel:'ダッシュボード',save:'ローカル保存が有効です',goal:'個人ポイント目標',presets:'クイック目標',choose:'目標を選択…',reset:'新イベント / リセット',total:'合計ポイント',remaining:'残りポイント',progress:'目標の進捗',daysActive:'ポイント獲得日数',summary:'7日間の概要',saved:'自動保存しました ✓',saveError:'このブラウザーに保存できません',points:'ポイント',day:'日',asc:'部隊昇格計算機',initial:'開始レベル',final:'最終レベル',amount:'昇格する部隊数',resetConfirm:'新しいイベントを開始しますか？保存された目標とデータは削除されます。',footer:'非公式の個人用ツール。'},
+ ko:{language:'언어',panel:'대시보드',save:'로컬 저장 활성화됨',goal:'개인 점수 목표',presets:'빠른 목표',choose:'목표 선택…',reset:'새 이벤트 / 초기화',total:'누적 점수',remaining:'남은 점수',progress:'목표 진행률',daysActive:'점수가 있는 일수',summary:'7일 요약',saved:'자동 저장됨 ✓',saveError:'이 브라우저에 저장할 수 없습니다',points:'점수',day:'일차',asc:'부대 승급 계산기',initial:'시작 레벨',final:'최종 레벨',amount:'승급 부대 수',resetConfirm:'새 이벤트를 시작할까요? 저장된 목표와 데이터가 삭제됩니다.',footer:'비공식 개인 도구.'},
+ tr:{language:'Dil',panel:'Kontrol paneli',save:'Yerel kayıt etkin',goal:'Kişisel puan hedefi',presets:'Hızlı hedefler',choose:'Hedef seç…',reset:'Yeni etkinlik / Sıfırla',total:'Toplam puan',remaining:'Kalan puan',progress:'Hedef ilerlemesi',daysActive:'Puanlı günler',summary:'Yedi günlük özet',saved:'Otomatik kaydedildi ✓',saveError:'Bu tarayıcıya kaydedilemedi',points:'puan',day:'Gün',asc:'Birlik yükseltme hesaplayıcısı',initial:'Başlangıç seviyesi',final:'Son seviye',amount:'Yükseltilen birlikler',resetConfirm:'Yeni etkinlik başlatılsın mı? Kaydedilen hedef ve veriler silinecek.',footer:'Resmî olmayan kişisel araç.'},
+ pl:{language:'Język',panel:'Panel',save:'Zapis lokalny włączony',goal:'Osobisty cel punktów',presets:'Szybkie cele',choose:'Wybierz cel…',reset:'Nowe wydarzenie / Resetuj',total:'Łączna liczba punktów',remaining:'Pozostałe punkty',progress:'Postęp celu',daysActive:'Dni z punktami',summary:'Podsumowanie siedmiu dni',saved:'Zapisano automatycznie ✓',saveError:'Nie można zapisać w tej przeglądarce',points:'pkt',day:'Dzień',asc:'Kalkulator awansu jednostek',initial:'Poziom początkowy',final:'Poziom końcowy',amount:'Awansowane jednostki',resetConfirm:'Rozpocząć nowe wydarzenie? Cel i zapisane dane zostaną usunięte.',footer:'Nieoficjalne narzędzie osobiste.'},
+ nl:{language:'Taal',panel:'Dashboard',save:'Lokaal opslaan ingeschakeld',goal:'Persoonlijk puntendoel',presets:'Snelle doelen',choose:'Doel kiezen…',reset:'Nieuw evenement / Reset',total:'Totaal punten',remaining:'Resterende punten',progress:'Voortgang doel',daysActive:'Dagen met punten',summary:'Overzicht van zeven dagen',saved:'Automatisch opgeslagen ✓',saveError:'Opslaan in deze browser mislukt',points:'punten',day:'Dag',asc:'Eenheden-promotiecalculator',initial:'Beginniveau',final:'Eindniveau',amount:'Gepromoveerde eenheden',resetConfirm:'Een nieuw evenement starten? Het doel en opgeslagen gegevens worden verwijderd.',footer:'Onofficiële persoonlijke tool.'},
+ ar:{language:'اللغة',panel:'لوحة التحكم',save:'الحفظ المحلي مفعّل',goal:'هدف النقاط الشخصي',presets:'أهداف سريعة',choose:'اختر هدفًا…',reset:'حدث جديد / إعادة ضبط',total:'إجمالي النقاط',remaining:'النقاط المتبقية',progress:'تقدم الهدف',daysActive:'الأيام ذات النقاط',summary:'ملخص الأيام السبعة',saved:'تم الحفظ تلقائيًا ✓',saveError:'تعذر الحفظ في هذا المتصفح',points:'نقاط',day:'اليوم',asc:'حاسبة ترقية الوحدات',initial:'المستوى الأولي',final:'المستوى النهائي',amount:'الوحدات التي تمت ترقيتها',resetConfirm:'هل تريد بدء حدث جديد؟ سيتم حذف الهدف والبيانات المحفوظة.',footer:'أداة شخصية غير رسمية.'},
+ id:{language:'Bahasa',panel:'Dasbor',save:'Penyimpanan lokal aktif',goal:'Target poin pribadi',presets:'Target cepat',choose:'Pilih target…',reset:'Acara baru / Atur ulang',total:'Total poin',remaining:'Sisa poin',progress:'Progres target',daysActive:'Hari dengan poin',summary:'Ringkasan tujuh hari',saved:'Tersimpan otomatis ✓',saveError:'Tidak dapat menyimpan di browser ini',points:'poin',day:'Hari',asc:'Kalkulator promosi unit',initial:'Level awal',final:'Level akhir',amount:'Unit yang dipromosikan',resetConfirm:'Mulai acara baru? Target dan data yang tersimpan akan dihapus.',footer:'Alat pribadi tidak resmi.'},
+ th:{language:'ภาษา',panel:'แดชบอร์ด',save:'เปิดการบันทึกในเครื่องแล้ว',goal:'เป้าหมายคะแนนส่วนตัว',presets:'เป้าหมายด่วน',choose:'เลือกเป้าหมาย…',reset:'กิจกรรมใหม่ / รีเซ็ต',total:'คะแนนรวม',remaining:'คะแนนที่เหลือ',progress:'ความคืบหน้าเป้าหมาย',daysActive:'วันที่มีคะแนน',summary:'สรุปทั้งเจ็ดวัน',saved:'บันทึกอัตโนมัติแล้ว ✓',saveError:'บันทึกในเบราว์เซอร์นี้ไม่ได้',points:'คะแนน',day:'วันที่',asc:'เครื่องคำนวณเลื่อนขั้นหน่วย',initial:'ระดับเริ่มต้น',final:'ระดับสุดท้าย',amount:'จำนวนหน่วยที่เลื่อนขั้น',resetConfirm:'เริ่มกิจกรรมใหม่หรือไม่? เป้าหมายและข้อมูลที่บันทึกไว้จะถูกลบ',footer:'เครื่องมือส่วนตัวที่ไม่เป็นทางการ'},
+ vi:{language:'Ngôn ngữ',panel:'Bảng điều khiển',save:'Đã bật lưu cục bộ',goal:'Mục tiêu điểm cá nhân',presets:'Mục tiêu nhanh',choose:'Chọn mục tiêu…',reset:'Sự kiện mới / Đặt lại',total:'Tổng điểm',remaining:'Điểm còn lại',progress:'Tiến độ mục tiêu',daysActive:'Ngày có điểm',summary:'Tóm tắt bảy ngày',saved:'Đã tự động lưu ✓',saveError:'Không thể lưu trong trình duyệt này',points:'điểm',day:'Ngày',asc:'Máy tính thăng cấp quân',initial:'Cấp ban đầu',final:'Cấp cuối',amount:'Số quân thăng cấp',resetConfirm:'Bắt đầu sự kiện mới? Mục tiêu và dữ liệu đã lưu sẽ bị xóa.',footer:'Công cụ cá nhân không chính thức.'},
+ uk:{language:'Мова',panel:'Панель керування',save:'Локальне збереження увімкнено',goal:'Особиста ціль очок',presets:'Швидкі цілі',choose:'Вибрати ціль…',reset:'Нова подія / Скинути',total:'Усього очок',remaining:'Залишилося очок',progress:'Прогрес цілі',daysActive:'Дні з очками',summary:'Підсумок семи днів',saved:'Автоматично збережено ✓',saveError:'Не вдалося зберегти в браузері',points:'очок',day:'День',asc:'Калькулятор підвищення військ',initial:'Початковий рівень',final:'Кінцевий рівень',amount:'Підвищені війська',resetConfirm:'Почати нову подію? Ціль і збережені дані буде видалено.',footer:'Неофіційний особистий інструмент.'}
+};
+DAYS.forEach(d=>{if(!d._esName)d._esName=d.name});
+const DAY_NAMES = {
+ en:['Tribal Raid','Hero Growth','Resource Gathering','Race Against Time','Troop Training','Power Increase','All-Out Day'],
+ fr:['Raid tribal','Progression des héros','Collecte de ressources','Contre-la-montre','Entraînement des troupes','Augmentation de puissance','Dernier effort'],
+ de:['Stammesüberfall','Heldenentwicklung','Ressourcensammlung','Zeitrennen','Truppenausbildung','Machtzuwachs','Alles geben'],
+ it:['Incursione tribale','Crescita degli eroi','Raccolta risorse','Contro il tempo','Addestramento truppe','Aumento potere','Tutto per tutto'],
+ 'zh-CN':['部落突袭','英雄成长','资源采集','争分夺秒','部队训练','战力提升','全力冲刺'],
+ 'zh-TW':['部落突襲','英雄成長','資源採集','爭分奪秒','部隊訓練','戰力提升','全力衝刺'],
+ pt:['Incursão tribal','Crescimento do herói','Coleta de recursos','Contra o tempo','Treino de tropas','Aumento de poder','Tudo ou nada'],
+ 'pt-BR':['Incursão tribal','Crescimento do herói','Coleta de recursos','Contra o tempo','Treinamento de tropas','Aumento de poder','Tudo ou nada'],
+ ru:['Набег на племена','Развитие героя','Сбор ресурсов','Наперегонки со временем','Обучение войск','Рост мощи','Рывок к победе'],
+ ja:['部族襲撃','英雄育成','資源採集','時間との勝負','部隊訓練','戦力上昇','総力戦'],
+ ko:['부족 습격','영웅 성장','자원 채집','시간과의 경쟁','부대 훈련','전투력 증가','총력전'],
+ tr:['Kabile Baskını','Kahraman Gelişimi','Kaynak Toplama','Zamana Karşı Yarış','Birlik Eğitimi','Güç Artışı','Tüm Gücünle'],
+ pl:['Najaz plemienny','Rozwój bohatera','Zbieranie zasobów','Wyścig z czasem','Szkolenie wojsk','Wzrost mocy','Wszystko albo nic'],
+ nl:['Stamoverval','Heldengroei','Grondstoffen verzamelen','Race tegen de klok','Troepentraining','Machtstoename','Alles op alles'],
+ ar:['غارة قبلية','تطوير البطل','جمع الموارد','سباق مع الزمن','تدريب القوات','زيادة القوة','بذل كل الجهد'],
+ id:['Serangan Suku','Perkembangan Hero','Pengumpulan Sumber Daya','Berpacu dengan Waktu','Pelatihan Pasukan','Peningkatan Kekuatan','Kerahkan Semua'],
+ th:['บุกเผ่า','พัฒนาฮีโร่','รวบรวมทรัพยากร','แข่งกับเวลา','ฝึกทหาร','เพิ่มพลัง','ทุ่มสุดกำลัง'],
+ vi:['Đột kích bộ lạc','Phát triển anh hùng','Thu thập tài nguyên','Chạy đua thời gian','Huấn luyện quân','Tăng sức mạnh','Tổng lực'],
+ uk:['Набіг на племена','Розвиток героя','Збір ресурсів','Наввипередки з часом','Навчання військ','Зростання сили','Усі сили в бій']
+};
+function tr(key){const lang=$('languageSelect')?.value||'es';return (UI[lang]&&UI[lang][key])||UI.en[key]||UI.es[key]||key}
+const HEADER_SUBTITLES = {"es": "MGE CALCULATOR · GOBERNADOR MÁS PODEROSO", "en": "MGE CALCULATOR · MOST POWERFUL GOVERNOR", "fr": "CALCULATEUR MGE · GOUVERNEUR LE PLUS PUISSANT", "de": "MGE-RECHNER · MÄCHTIGSTER GOUVERNEUR", "it": "CALCOLATORE MGE · GOVERNATORE PIÙ POTENTE", "zh-CN": "MGE 计算器 · 最强总督", "zh-TW": "MGE 計算器 · 最強總督", "pt": "CALCULADORA MGE · GOVERNADOR MAIS PODEROSO", "pt-BR": "CALCULADORA MGE · GOVERNADOR MAIS PODEROSO", "ru": "КАЛЬКУЛЯТОР MGE · СИЛЬНЕЙШИЙ ГУБЕРНАТОР", "ja": "MGE計算機 · 最強の総督", "ko": "MGE 계산기 · 최강 총독", "tr": "MGE HESAPLAYICI · EN GÜÇLÜ VALİ", "pl": "KALKULATOR MGE · NAJPOTĘŻNIEJSZY GUBERNATOR", "nl": "MGE-CALCULATOR · MACHTIGSTE GOUVERNEUR", "ar": "حاسبة MGE · أقوى حاكم", "id": "KALKULATOR MGE · GUBERNUR TERKUAT", "th": "เครื่องคำนวณ MGE · ผู้ว่าการที่ทรงพลังที่สุด", "vi": "MÁY TÍNH MGE · THỐNG ĐỐC MẠNH NHẤT", "uk": "КАЛЬКУЛЯТОР MGE · НАЙМОГУТНІШИЙ ГУБЕРНАТОР"};
+const COPYRIGHT_TEXT = {
+'es':['© 2026 ERA 83 — MGE Calculator. Todos los derechos reservados.','Herramienta independiente creada para la comunidad de Age of Empires Mobile.','Queda prohibida la reproducción, distribución o modificación de los contenidos y del código original de este proyecto sin autorización de sus respectivos titulares, salvo en los casos permitidos por la ley.','Age of Empires Mobile es propiedad de sus respectivos titulares. Esta herramienta es un proyecto independiente y no oficial.'],
+'en':['© 2026 ERA 83 — MGE Calculator. All rights reserved.','Independent tool created for the Age of Empires Mobile community.','Reproduction, distribution, or modification of this project’s original content and code is prohibited without permission from the respective rights holders, except as permitted by law.','Age of Empires Mobile belongs to its respective rights holders. This is an independent, unofficial project.'],
+'fr':['© 2026 ERA 83 — MGE Calculator. Tous droits réservés.','Outil indépendant créé pour la communauté Age of Empires Mobile.','La reproduction, la distribution ou la modification du contenu et du code originaux de ce projet est interdite sans l’autorisation des titulaires respectifs, sauf dans les cas prévus par la loi.','Age of Empires Mobile appartient à ses titulaires respectifs. Cet outil est un projet indépendant et non officiel.'],
+'de':['© 2026 ERA 83 — MGE Calculator. Alle Rechte vorbehalten.','Unabhängiges Tool für die Age of Empires Mobile-Community.','Die Vervielfältigung, Verbreitung oder Änderung der Originalinhalte und des Originalcodes dieses Projekts ist ohne Zustimmung der jeweiligen Rechteinhaber untersagt, soweit gesetzlich zulässig.','Age of Empires Mobile gehört den jeweiligen Rechteinhabern. Dies ist ein unabhängiges, inoffizielles Projekt.'],
+'it':['© 2026 ERA 83 — MGE Calculator. Tutti i diritti riservati.','Strumento indipendente creato per la community di Age of Empires Mobile.','La riproduzione, distribuzione o modifica dei contenuti e del codice originali di questo progetto è vietata senza l’autorizzazione dei rispettivi titolari, salvo quanto consentito dalla legge.','Age of Empires Mobile appartiene ai rispettivi titolari. Questo è un progetto indipendente e non ufficiale.'],
+'zh-CN':['© 2026 ERA 83 — MGE Calculator。保留所有权利。','为《Age of Empires Mobile》社区创建的独立工具。','未经相应权利持有人许可，禁止复制、分发或修改本项目的原创内容和代码，法律允许的情况除外。','《Age of Empires Mobile》归其各自权利持有人所有。本工具为独立的非官方项目。'],
+'zh-TW':['© 2026 ERA 83 — MGE Calculator。保留所有權利。','為《Age of Empires Mobile》社群建立的獨立工具。','未經相應權利人許可，禁止複製、散布或修改本專案的原創內容與程式碼，法律允許的情況除外。','《Age of Empires Mobile》屬於其各自權利人。本工具為獨立的非官方專案。'],
+'pt':['© 2026 ERA 83 — MGE Calculator. Todos os direitos reservados.','Ferramenta independente criada para a comunidade de Age of Empires Mobile.','É proibida a reprodução, distribuição ou modificação dos conteúdos e do código original deste projeto sem autorização dos respetivos titulares, salvo nos casos permitidos por lei.','Age of Empires Mobile pertence aos respetivos titulares. Esta ferramenta é um projeto independente e não oficial.'],
+'pt-BR':['© 2026 ERA 83 — MGE Calculator. Todos os direitos reservados.','Ferramenta independente criada para a comunidade de Age of Empires Mobile.','É proibida a reprodução, distribuição ou modificação dos conteúdos e do código original deste projeto sem autorização dos respectivos titulares, exceto nos casos permitidos por lei.','Age of Empires Mobile pertence aos seus respectivos titulares. Esta ferramenta é um projeto independente e não oficial.'],
+'ru':['© 2026 ERA 83 — MGE Calculator. Все права защищены.','Независимый инструмент для сообщества Age of Empires Mobile.','Воспроизведение, распространение или изменение оригинального содержимого и кода проекта без разрешения соответствующих правообладателей запрещено, кроме случаев, разрешённых законом.','Age of Empires Mobile принадлежит соответствующим правообладателям. Это независимый неофициальный проект.'],
+'ja':['© 2026 ERA 83 — MGE Calculator. 無断転載・無断使用を禁じます。','Age of Empires Mobile コミュニティ向けに作成された独立ツールです。','法律で認められる場合を除き、権利者の許可なく本プロジェクトのオリジナルコンテンツやコードを複製、配布、改変することを禁じます。','Age of Empires Mobile は各権利者に帰属します。本ツールは独立した非公式プロジェクトです。'],
+'ko':['© 2026 ERA 83 — MGE Calculator. 모든 권리 보유.','Age of Empires Mobile 커뮤니티를 위해 만든 독립 도구입니다.','법률상 허용되는 경우를 제외하고, 각 권리자의 허가 없이 이 프로젝트의 원본 콘텐츠와 코드를 복제·배포·수정할 수 없습니다.','Age of Empires Mobile의 권리는 각 권리자에게 있습니다. 본 도구는 독립적인 비공식 프로젝트입니다.'],
+'tr':['© 2026 ERA 83 — MGE Calculator. Tüm hakları saklıdır.','Age of Empires Mobile topluluğu için oluşturulmuş bağımsız araç.','Yasaların izin verdiği durumlar dışında, ilgili hak sahiplerinin izni olmadan bu projenin özgün içeriğinin ve kodunun çoğaltılması, dağıtılması veya değiştirilmesi yasaktır.','Age of Empires Mobile ilgili hak sahiplerine aittir. Bu araç bağımsız ve resmî olmayan bir projedir.'],
+'pl':['© 2026 ERA 83 — MGE Calculator. Wszelkie prawa zastrzeżone.','Niezależne narzędzie stworzone dla społeczności Age of Empires Mobile.','Powielanie, rozpowszechnianie lub modyfikowanie oryginalnych treści i kodu projektu bez zgody odpowiednich właścicieli praw jest zabronione, z wyjątkiem przypadków dozwolonych przez prawo.','Age of Empires Mobile należy do odpowiednich właścicieli praw. To niezależny, nieoficjalny projekt.'],
+'nl':['© 2026 ERA 83 — MGE Calculator. Alle rechten voorbehouden.','Onafhankelijke tool gemaakt voor de Age of Empires Mobile-community.','Reproductie, verspreiding of wijziging van de originele inhoud en code van dit project is zonder toestemming van de rechthebbenden verboden, behalve waar de wet dit toestaat.','Age of Empires Mobile behoort toe aan de respectieve rechthebbenden. Dit is een onafhankelijk, niet-officieel project.'],
+'ar':['© 2026 ERA 83 — MGE Calculator. جميع الحقوق محفوظة.','أداة مستقلة أُنشئت لمجتمع Age of Empires Mobile.','يُحظر نسخ المحتوى الأصلي لهذا المشروع أو توزيعه أو تعديله دون إذن أصحاب الحقوق المعنيين، باستثناء الحالات التي يسمح بها القانون.','تعود ملكية Age of Empires Mobile إلى أصحاب الحقوق المعنيين. هذه أداة مستقلة وغير رسمية.'],
+'id':['© 2026 ERA 83 — MGE Calculator. Hak cipta dilindungi.','Alat independen yang dibuat untuk komunitas Age of Empires Mobile.','Dilarang memperbanyak, mendistribusikan, atau mengubah konten dan kode asli proyek ini tanpa izin pemegang hak terkait, kecuali jika diizinkan oleh hukum.','Age of Empires Mobile dimiliki oleh pemegang hak masing-masing. Alat ini merupakan proyek independen dan tidak resmi.'],
+'th':['© 2026 ERA 83 — MGE Calculator. สงวนลิขสิทธิ์','เครื่องมืออิสระที่สร้างขึ้นสำหรับชุมชน Age of Empires Mobile','ห้ามทำซ้ำ เผยแพร่ หรือแก้ไขเนื้อหาและโค้ดต้นฉบับของโครงการนี้โดยไม่ได้รับอนุญาตจากผู้ถือสิทธิ์ที่เกี่ยวข้อง เว้นแต่กฎหมายอนุญาต','Age of Empires Mobile เป็นทรัพย์สินของผู้ถือสิทธิ์ที่เกี่ยวข้อง เครื่องมือนี้เป็นโครงการอิสระและไม่เป็นทางการ'],
+'vi':['© 2026 ERA 83 — MGE Calculator. Bảo lưu mọi quyền.','Công cụ độc lập dành cho cộng đồng Age of Empires Mobile.','Nghiêm cấm sao chép, phân phối hoặc sửa đổi nội dung và mã nguồn gốc của dự án này khi chưa được chủ sở hữu quyền liên quan cho phép, trừ trường hợp pháp luật cho phép.','Age of Empires Mobile thuộc về các chủ sở hữu quyền tương ứng. Đây là dự án độc lập, không chính thức.'],
+'uk':['© 2026 ERA 83 — MGE Calculator. Усі права захищено.','Незалежний інструмент для спільноти Age of Empires Mobile.','Відтворення, розповсюдження або зміна оригінального вмісту й коду цього проєкту без дозволу відповідних правовласників заборонені, крім випадків, дозволених законом.','Age of Empires Mobile належить відповідним правовласникам. Це незалежний неофіційний проєкт.']
+};
+function applyCopyrightLanguage(lang){const t=COPYRIGHT_TEXT[lang]||COPYRIGHT_TEXT.en;['copyrightTitle','copyrightIndependence','copyrightRestriction','copyrightDisclaimer'].forEach((id,i)=>{const el=$(id);if(el)el.textContent=t[i]});}
+function applyLanguage(){
+ const lang=$('languageSelect').value||'es'; const u=UI[lang]||UI.en;
+ document.documentElement.lang=lang;
+ applyCopyrightLanguage(lang);
+ const subtitle=document.querySelector('header .subtitle');
+ if(subtitle) subtitle.textContent=HEADER_SUBTITLES[lang]||HEADER_SUBTITLES.en;
+ const edition=document.querySelector('header .edition');
+ if(edition) edition.textContent=({es:'VERSIÓN 1.1.3',en:'VERSION 1.1.3',fr:'VERSION 1.1.3',de:'VERSION 1.1.3',it:'VERSIONE 1.1.3','zh-CN':'版本 1.1.3','zh-TW':'版本 1.1.3',pt:'VERSÃO 1.1.3','pt-BR':'VERSÃO 1.1.3',ru:'ВЕРСИЯ 1.1.3',ja:'バージョン 1.1.3',ko:'버전 1.1.3',tr:'SÜRÜM 1.1.3',pl:'WERSJA 1.1.3',nl:'VERSIE 1.1.3',ar:'الإصدار 1.1.3',id:'VERSI 1.1.3',th:'เวอร์ชัน 1.1.3',vi:'PHIÊN BẢN 1.1.3',uk:'ВЕРСІЯ 1.1.3'})[lang]||'VERSION 1.1.3';
+ $('languageLabel').textContent=u.language;
+ $('languageSelect').setAttribute('aria-label',u.language);
+ document.querySelector('section.panel .toolbar h2').textContent=u.panel;
+ $('saveStatus').textContent=u.save;
+ document.querySelector('label[for="goal"]').textContent=u.goal;
+ document.querySelector('label[for="preset"]').textContent=u.presets;
+ $('preset').options[0].textContent=u.choose;
+ $('resetBtn').textContent=u.reset;
+ const labels=[u.total,u.remaining,u.progress,u.daysActive];
+ document.querySelectorAll('.stat .label').forEach((el,i)=>{if(i<labels.length)el.textContent=labels[i]});
+ document.querySelector('section.panel h2').textContent=u.summary;
+
+ DAYS.forEach((d,i)=>{if(lang==='es'){d.name=d._esName||d.name}else{if(!d._esName)d._esName=d.name;d.name=(DAY_NAMES[lang]||DAY_NAMES.en||[])[i]||d._esName;}});
+ renderAll();
+}
+function initLanguage(){
+ const select=$('languageSelect');
+ select.innerHTML=LANGUAGES.map(([code,label])=>`<option value="${code}">${label}</option>`).join('');
+ let stored='es';try{stored=localStorage.getItem(LANG_STORAGE_KEY)||'es'}catch(e){}
+ select.value=LANGUAGES.some(x=>x[0]===stored)?stored:'es';
+ select.addEventListener('change',()=>{try{localStorage.setItem(LANG_STORAGE_KEY,select.value)}catch(e){};applyLanguage()});
+}
+
+initLanguage();
+loadState();
+$('goal').value=state.goal;
+applyLanguage();
+renderAll();
+</script>
+</body>
+</html>
